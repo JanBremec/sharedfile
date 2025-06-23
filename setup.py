@@ -27,8 +27,7 @@ setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: C",
-        "License :: OSI Approved :: Apache Software License",
-        "Operating System :: OS Dependent",
+        "License :: OSI Approved :: Apache Software License"
     ],
     ext_modules=[sharedfile_module],
 )
