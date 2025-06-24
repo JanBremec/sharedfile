@@ -1,4 +1,4 @@
-name: Publish to PyPI
+name: Build and Publish to PyPI
 
 on:
   push:
@@ -6,31 +6,54 @@ on:
       - 'v*'
 
 jobs:
-  build-and-publish:
-    name: Build and publish Python 🐍 distribution 📦 to PyPI
+  build:
+    name: Build wheels for all platforms
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install cibuildwheel
+        run: pip install cibuildwheel
+
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir dist
+        env:
+          CIBW_SKIP: pp*  # skip PyPy
+          CIBW_ARCHS_LINUX: x86_64
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-distributions
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/sharedfile/
 
     permissions:
       id-token: write
-      contents: read
-
-    environment: pypi
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Download built distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: built-distributions
+          path: dist/
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
-
-    - name: Install build
-      run: python -m pip install build
-
-    - name: Build package
-      run: python -m build
-
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
