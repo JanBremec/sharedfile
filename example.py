@@ -3,7 +3,7 @@ import time
 import sharedfile
 
 def writer():
-    with sharedfile.open("shared_test.txt", mode="r", share="rw") as f:
+    with sharedfile.open("shared_test.txt", mode="w", share="rw") as f:
         for i in range(5):
             line = f"Writer line {i}\n"
             f.write(line)
