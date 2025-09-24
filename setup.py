@@ -16,7 +16,7 @@ sharedfile_module = Extension(
 
 setup(
     name='sharedfile',
-    version='0.3',
+    version='0.6',
     description='Cross-platform shared file open with share flags',
     long_description=open("README.md").read(),
     long_description_content_type='text/markdown',
